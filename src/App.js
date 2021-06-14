@@ -8,8 +8,8 @@ function App() {
 
   const [ busqueda, guardarBusqueda ] = useState('');
   const [ imagenes, guardarImagenes ] = useState([]);
-  const [ paginaactual, guardarPaginaActual ] = useState(5);
-  const [ totalpaginas, guardarTotalPaginas ] = useState(10);
+  const [ paginaactual, guardarPaginaActual ] = useState(1);
+  const [ totalpaginas, guardarTotalPaginas ] = useState(3);
 
   // useEffect
   useEffect(() => {
@@ -18,7 +18,7 @@ function App() {
 
     const imagenesPorPagina = 30;
     const key = '22045805-39d9ab781e3daa10a0055cd54';
-    const url = `https://pixabay.com/api/?key=${key}&q=${busqueda}&per_page=${imagenesPorPagina}`;
+    const url = `https://pixabay.com/api/?key=${key}&q=${busqueda}&per_page=${imagenesPorPagina}&page=${paginaactual}`;
 
     const respuesta = await fetch(url);
     const resultado = await respuesta.json();
@@ -28,10 +28,14 @@ function App() {
     // Calcular el total de páginas
     const calcularTotalPaginas = Math.ceil(resultado.totalHits / imagenesPorPagina );
     guardarTotalPaginas(calcularTotalPaginas);
+
+    // Mover pantalla hacia arriba
+    const jumbotron = document.querySelector('.jumbotron');
+    jumbotron.scrollIntoView({ behavior: 'smooth'})
    }
    consultarApi();
 
-  }, [busqueda])
+  }, [busqueda, paginaactual])
 
   // Definir la página anterior
   const paginaAnterior = () => {
@@ -68,17 +72,21 @@ function App() {
           imagenes={imagenes}
         />
 
-        <button
-          type="button"
-          className="bbtn btn-info mr-1"
-          onClick={paginaAnterior}
-        >&laquo; Anterior</button>
+        { (paginaactual === 1) ? null : (
+            <button
+                type="button"
+                className="bbtn btn-info mr-1"
+                onClick={paginaAnterior}
+            >&laquo; Anterior</button>
+        )}
 
-        <button
-          type="button"
-          className="bbtn btn-info"
-          onClick={paginaSiguiente}
-        >Siguiente &raquo;</button>
+        {(paginaactual === totalpaginas ) ? null : (
+            <button
+                type="button"
+                className="bbtn btn-info"
+                onClick={paginaSiguiente}
+            >Siguiente &raquo;</button>
+        )}
       </div>
     </div>    
   );
